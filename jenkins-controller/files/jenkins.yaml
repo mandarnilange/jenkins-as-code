@@ -1,0 +1,225 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - basicSSHUserPrivateKey:
+          description: "Private SSH key to access git repo"
+          id: "git_private_key"
+          privateKeySource:
+            directEntry:
+              privateKey: ${SSH_PRIVATE_KEY}
+          scope: GLOBAL
+          username: "jenkins"
+jobs:
+  - script: | 
+      job('UI') {
+        displayName('My UI Project')
+        description('My first job')
+        steps {
+          shell('echo Hello World!')
+        }
+      }
+      
+      job('Microservice') {
+        displayName('My Microservice Project')
+        description('My Microservice ')
+        environmentVariables {
+          keepBuildVariables(true)
+        }
+        steps {
+          shell('echo Hello from Microservice! Build number: $BUILD_NUMBER')
+        }
+      }
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
+  numExecutors: 0
+  mode: NORMAL
+  myViewsTabBar: "standard"
+  projectNamingStrategy: "standard"
+  disableRememberMe: false
+  scmCheckoutRetryCount: 0
+  slaveAgentPort: 50000
+  quietPeriod: 5
+  viewsTabBar: "standard"
+  agentProtocols:
+  - "JNLP4-connect"
+  - "Ping"
+  authorizationStrategy:
+    roleBased:
+      roles:
+        global:
+        - assignments:
+          - "admin"
+          name: "admin"
+          pattern: ".*"
+          permissions:
+          - "Overall/Administer"
+          - "Overall/Read"
+        - assignments:
+          - "readonly"
+          name: "global_read_only"
+          pattern: ".*"
+          permissions:
+          - "Overall/Read"
+          - "Job/Read"
+          - "Agent/Build"
+  clouds:
+  # TODO add details here for cloud nodes 
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
+  markupFormatter:
+    rawHtml:
+      disableSyntaxHighlighting: false
+  nodeProperties:
+# TODO add details here 
+  nodes:
+  - permanent:
+      launcher:
+        jnlp:
+          workDirSettings:
+            disabled: false
+            failIfWorkDirIsMissing: false
+            internalDir: "remoting"
+      name: "docker-agent2"
+      remoteFS: "/home/jenkins/agent "
+      retentionStrategy: "always"
+  primaryView:
+    all:
+      name: "all"
+  remotingSecurity:
+    enabled: true
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:  
+      - id: "admin"
+        password: "admin"
+        name: "Jenkins Admin"
+        properties:
+        - "apiToken"
+        - "myView"
+        - preferredProvider:
+            providerId: "default"
+        - "timezone"
+        - mailer:
+            emailAddress: "admin@temp.com"
+      - id: "readonly"
+        password: "readonly" 
+        name: "ReadOnly User"
+        properties:
+        - "apiToken"
+        - "myView"
+        - preferredProvider:
+            providerId: "default"
+        - "slack"
+        - "timezone"
+        - mailer:
+            emailAddress: "readonly@temp.com"
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins.io/update-center.json"
+  views:
+  - list:
+      columns:
+      - "status"
+      - "weather"
+      - "jobName"
+      - "lastSuccess"
+      - "lastFailure"
+      - "lastDuration"
+      - "buildButton"
+      name: "UI"
+  - list:
+      columns:
+      - "status"
+      - "weather"
+      - "jobName"
+      - "lastSuccess"
+      - "lastFailure"
+      - "lastDuration"
+      - "buildButton"
+      name: "Microservices"
+  - all:
+      name: "all"
+globalCredentialsConfiguration:
+  configuration:
+    providerFilter: "none"
+    typeFilter: "none"
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  gitHooks:
+    allowedOnAgents: false
+    allowedOnController: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "acceptFirstConnectionStrategy"
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: true
+  sSHD:
+    port: -1
+  scriptApproval:
+    approvedScriptHashes:
+    - "305981be84eeddca1b9a595f2103bbe044620582"
+    - "31c2f1a8179880541abc5b5ce9aaf218516f98b5"
+    - "39bbea8021298d87ba7000e1ac490a2b40edbe28"
+    - "3f985bfdad6299a4e0da63899245b407f97bf161"
+    - "8867f66ef0e488a324d0e0ac5bf4dd1e7b19f164"
+    - "88bfa381bc692f336d0559175e2707aa207d2305"
+    - "96c7a739213b492362dc9fe4671ffc7c6347cdd1"
+    - "SHA512:1f5c9eb80f3aa7f046ec8436cbfa5831556f31ea999646a66549f03e72c0fad702175a7828e08138acb09715166674a9f537b1f576deaae93daef43385e8adcc"
+    - "SHA512:3f205299bef2fe3329258a42f2c60d332cc35ccb41a3ca0512d7869c6aff4561ff708c48123b4f7c3dec33ccca30d54fb8b9b51b5bc7070f96236d11a3f0bdcb"
+    - "SHA512:bbb6ed9eda69d04a8eef8df242daee2db4c50b1659c021d1dda28fd9b7cc3c4825e80b1c81a12974ea387826824d3fe2473c7f059d41b047df4f52cb5ab15068"
+    - "c13887c7fd047469d90c93dbbf094fd26bf64e8c"
+    - "ff3dea30a7b973cd0ef01532be7f490d56c03655"
+unclassified:
+  buildDiscarders:
+    configuredBuildDiscarders:
+    - "jobBuildDiscarder"
+  buildStepOperation:
+    enabled: false
+  fingerprints:
+    fingerprintCleanupDisabled: false
+    storage: "file"
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  scmGit:
+    addGitTagAction: false
+    allowSecondFetch: false
+    createAccountBasedOnEmail: false
+    disableGitToolChooser: false
+    hideCredentials: false
+    showEntireCommitSummaryInChanges: false
+    useExistingAccountWithSameEmail: false
+  globalTimeOutConfiguration:
+    operations:
+    - "abortOperation"
+    overwriteable: false
+  location:
+    adminAddress: "admin@nowhere.com"
+    url: ${MY_JENKINS_URL}
+  mailer:
+    charset: "UTF-8"
+    useSsl: false
+    useTls: false
+  pollSCM:
+    pollingThreadCount: 10
+  timestamper:
+    allPipelines: false
+    elapsedTimeFormat: "'<b>'HH:mm:ss.S'</b> '"
+    systemTimeFormat: "'<b>'HH:mm:ss'</b> '"
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
+  gradle:
+    installations:
+    - home: "/opt/gradle/gradle-7.2"
+      name: "Gradle-7.2"
+
+
